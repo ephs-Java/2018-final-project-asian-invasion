@@ -15,11 +15,12 @@ class Window(Frame):
         lbl2.pack()
         ent2 = Entry(root)
         ent2.pack()
-        lbl3 = Label(root, text="Ritik is the GOAT")
-        lbl3.pack()
         btn = Button(root, text="Log In")
         btn.pack()
-
+        lbl3 = Label(root, text="Ritik is the GOAT")
+        lbl3.pack()
+        btn2 = Button(root, text="Confirm")
+        btn2.pack()
 
 root = Tk()
 app = Window(root)

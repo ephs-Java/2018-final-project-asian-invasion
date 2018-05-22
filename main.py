@@ -9,9 +9,11 @@ class Window(Frame):
         self.master = master
         self.make_widgets()
 
-
     def make_widgets(self):
-        lbl = Label()
+        ent = Entry(root)
+        ent.pack()
+        lbl2 = Label(root, text="Password")
+        lbl2.pack()
 
 
 if __name__ == '__main__':

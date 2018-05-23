@@ -1,5 +1,6 @@
 from tkinter import *
 
+
 class Window(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
@@ -21,6 +22,7 @@ class Window(Frame):
         lbl3.pack()
         btn2 = Button(root, text="Confirm")
         btn2.pack()
+
 
 root = Tk()
 app = Window(root)

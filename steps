@@ -1,4 +1,9 @@
 
+Do this to switch to your branch
+
+
+git checkout [branch name]
+
 
 git status
 
@@ -8,7 +13,7 @@ git status
 
 git commit
 
-i
+
 [Message]
 esc
 :wq

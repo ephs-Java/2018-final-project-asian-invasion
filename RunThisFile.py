@@ -14,7 +14,7 @@ loaded_model_json = json_file.read()
 json_file.close()
 model = model_from_json(loaded_model_json)
 
-for num in range(1,3) :
+for num in range(1,5) :
     # load weights into  model
     model.load_weights("model.h5")
     print("Loaded model from disk")

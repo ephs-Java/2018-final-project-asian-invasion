@@ -11,10 +11,11 @@ Y = dataset[:,8]
 
 model = Sequential()
 model.add(Dense(12, input_dim=8, activation='relu'))
+model.add(Dense(10, activation='relu'))
 model.add(Dense(8, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='binary_crossentropy', optimizer='adagrad', metrics=['accuracy'])
 
 model.fit(X, Y, epochs=150, batch_size=10)
 

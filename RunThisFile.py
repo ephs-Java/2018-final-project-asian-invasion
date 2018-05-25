@@ -14,14 +14,14 @@ loaded_model_json = json_file.read()
 json_file.close()
 model = model_from_json(loaded_model_json)
 
-for num in range(1,6) :
+for num in range(1,3) :
     # load weights into  model
     model.load_weights("model.h5")
     print("Loaded model from disk")
 
     # compile and run the model
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    model.fit(X, Y, epochs=1000, batch_size=100)
+    model.fit(X, Y, epochs=1800, batch_size=300)
 
     # save weights to the file thing
     model.save_weights("model.h5")

@@ -18,9 +18,12 @@ def clickPieceRed(event):
         matrixchecker[event.x // 100][event.y // 100] = 2
     paintBoard()
 def nextButton(event):
-    matrixchecker[event.x//100][event.y//100]=1
-def isMovable():
+    if isMovable(event.x//100, event.y//100) and :
 
+def isMovable(x, y):
+    if matrixchecker[x][y]==0:
+        return True
+    return False
 def paintBoard():
     for i in range(6):
         for j in range(6):

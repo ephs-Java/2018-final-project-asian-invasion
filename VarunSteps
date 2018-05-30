@@ -1,0 +1,16 @@
+≠
+
+git status
+
+git add [File, can be .]
+
+git status
+
+git commit
+
+i
+[Message]
+esc
+:wq
+
+git push

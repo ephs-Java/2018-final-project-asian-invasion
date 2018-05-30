@@ -12,10 +12,6 @@ def sum_tuple(a, b):
 
 
 class CheckerBoard:
-    NORTHEAST = (-1, 1)
-    NORTHWEST = (-1, -1)
-    SOUTHEAST = (1, 1)
-    SOUTHWEST = (1, -1)
 
     KING_VAL = 3
 
@@ -231,9 +227,13 @@ class CheckerBoard:
 
     def get_alt_state_vec(self):
         vec = np.zeros((1, 32))
+        vec_i = 0
         for r, row in enumerate(self.board):
             for c, entry in enumerate(row):
-                pass
+                if (r + c) % 2 == 0:
+                    vec[0, vec_i] = entry
+        return vec
+
 
     def scramble(self):
         for _ in range(random.randint(8, 25)):
@@ -299,6 +299,7 @@ if __name__ == '__main__':
     #
     #     print("\n\n----------------------------------------------------\n\n")
     # print(board.flip_board())
+    #
     #
     print(board)
     board.scramble()

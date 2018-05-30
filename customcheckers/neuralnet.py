@@ -8,7 +8,7 @@ from keras.layers import Dense
 
 from checkers import CheckerBoard
 
-FILE_NAME = 'checkers_model_tanh_adadelta.h5'
+FILE_NAME = 'alternate_state_vec.h5'
 
 Move = namedtuple('Move', ['oldLoc', 'newLoc'])
 TrainingData = namedtuple('TrainingData', ['stateVec', 'whoWins'])
@@ -17,31 +17,37 @@ thing_1 = Sequential()
 
 # Adding the input layerthing_1.add(Dense(units=1, kernel_initializer='uniform', activation='tanh', input_dim=16))
 
-thing_1.add(Dense(units=16, kernel_initializer='uniform', activation='relu', input_dim=8))
-thing_1.add(Dense(units=1, kernel_initializer='uniform', activation='tanh', input_dim=16))
+thing_1.add(Dense(units=64, kernel_initializer='uniform', activation='relu', input_dim=32))
+thing_1.add(Dense(units=64, kernel_initializer='uniform', activation='relu', input_dim=64))
+thing_1.add(Dense(units=1, kernel_initializer='uniform', activation='tanh', input_dim=64))
 
 # output 0 for not win, 1 for win
 thing_1.compile(optimizer="adadelta", loss="mse", metrics=['accuracy'])
+
+thing_2 = Sequential()
+
+# Adding the input layer
+thing_2.add(Dense(units=64, kernel_initializer='uniform', activation='relu', input_dim=32))
+thing_2.add(Dense(units=64, kernel_initializer='uniform', activation='relu', input_dim=64))
+thing_2.add(Dense(units=1, kernel_initializer='uniform', activation='tanh', input_dim=64))
+
+# output 0 for not win, 1 for win
+thing_2.compile(optimizer="adadelta", loss="mse", metrics=['accuracy'])
+
 
 try:
     thing_1.load_weights("thing1___" + FILE_NAME)
 except Exception:
     print("WARN: model thing1 has not been saved previously")
-
-thing_2 = Sequential()
-
-# Adding the input layer
-thing_2.add(Dense(units=16, kernel_initializer='uniform', activation='relu', input_dim=8))
-thing_2.add(Dense(units=1, kernel_initializer='uniform', activation='tanh', input_dim=16))
-
-# output 0 for not win, 1 for win
-thing_2.compile(optimizer="adadelta", loss="mse", metrics=['accuracy'])
+else:
+    print("Loaded thing 1 a-ok")
 
 try:
     thing_2.load_weights("thing2___" + FILE_NAME)
 except Exception:
     print("WARN: model thing2 has not been saved previously")
-
+else:
+    print("loaded thing2 a-ok")
 
 def max_index(iterable):
     max_val = iterable[0]
@@ -62,6 +68,7 @@ if __name__ == '__main__':
             thing2_data = []
 
             for i in range(games_per_itr):  # play multiple games
+                should_display_game_results = i == games_per_itr - 1
                 game = CheckerBoard()
                 game.scramble()
                 thing1_state_vecs = []
@@ -69,6 +76,7 @@ if __name__ == '__main__':
 
                 # by flippping the board we switch teams but actually stay on team 1 according to the game object
                 team_for_real = 1
+                moves_taken = 0
                 while not game.is_game_over()[0]:  # play 1 game
 
                     moves = game.get_all_possible_moves()
@@ -83,7 +91,7 @@ if __name__ == '__main__':
                     possible_board_states = [game.pretend_to_move_piece(move.oldLoc, move.newLoc) for move in
                                              possible_moves_lst]
 
-                    possible_state_vecs = [state.get_state_vec() for state in possible_board_states]
+                    possible_state_vecs = [state.get_alt_state_vec() for state in possible_board_states]
 
                     if team_for_real == 1:
                         scores = [thing_1.predict(vec)[0, 0] for vec in possible_state_vecs]
@@ -95,19 +103,28 @@ if __name__ == '__main__':
                     game.move_piece(best_move.oldLoc, best_move.newLoc)
 
                     if team_for_real == 1:
-                        thing1_state_vecs.append(game.get_state_vec())
+                        thing1_state_vecs.append(game.get_alt_state_vec())
                     else:
-                        thing2_state_vecs.append(game.get_state_vec())
+                        thing2_state_vecs.append(game.get_alt_state_vec())
 
+                    if should_display_game_results and team_for_real == 1:
+                        print(game)
                     game.flip_board_nocopy()
+                    if should_display_game_results and team_for_real == -1:
+                        print(game)
+
+                    if should_display_game_results:
+                        print("#############################################################################")
                     team_for_real *= -1
+                    moves_taken += 1
+
 
                 did_we_win = game.is_game_over()
                 print("Played", i, "of", games_per_itr, "games")
                 # post game memory
                 who_actually_won = team_for_real * did_we_win[1]
 
-                thing1_score = (who_actually_won + 1) / 2
+                thing1_score = ((who_actually_won + 1) / 2) * 6 / moves_taken
                 thing2_score = (-who_actually_won + 1) / 2
 
                 thing1_data.extend(
@@ -130,7 +147,7 @@ if __name__ == '__main__':
         thing_1.save_weights(FILE_NAME)
 
     except KeyboardInterrupt as e:
-        thing_1.save_weights('crashed___thing1___' + FILE_NAME)
-        thing_2.save_weights('crashed___thing2___' + FILE_NAME)
+        thing_1.save_weights('thing1___' + FILE_NAME)
+        thing_2.save_weights('thing2___' + FILE_NAME)
         print("WARN: Crashed")
         print(e)

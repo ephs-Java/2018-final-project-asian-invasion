@@ -35,7 +35,7 @@ def get_moves_human():
     return piece, move
 
 
-def get_moves_computer(model):
+def get_moves_computer(model=thing_2):
     moves = game.get_all_possible_moves()
 
     possible_moves_lst = []
@@ -47,33 +47,34 @@ def get_moves_computer(model):
     possible_board_states = [game.pretend_to_move_piece(move.oldLoc, move.newLoc) for move in
                              possible_moves_lst]
 
-    possible_state_vecs = [state.get_state_vec() for state in possible_board_states]
+    possible_state_vecs = [state.get_alt_state_vec() for state in possible_board_states]
 
     scores = [model.predict(vec)[0, 0] for vec in possible_state_vecs]
 
     return possible_moves_lst[max_index(scores)]
 
-
-while not game.is_game_over()[0]:
-    if game.current_turn == 1:
-        best_move = get_moves_computer(thing_1)
-
-        game.move_piece(best_move.oldLoc, best_move.newLoc)
-    else:
-
-        if HUMAN_PLAYING:
-            piece, move = get_moves_human()
-            game.move_piece(piece, move)
-
-        else:
-            game.flip_board_nocopy()  # flip it for use
-
-            best_move = get_moves_computer(thing_2)
+if __name__ == "__main__":
+    while not game.is_game_over()[0]:
+        if game.current_turn == 1:
+            best_move = get_moves_computer(thing_1)
 
             game.move_piece(best_move.oldLoc, best_move.newLoc)
+        else:
 
-            game.flip_board_nocopy()  # flip it back
+            if HUMAN_PLAYING:
+                piece, move = get_moves_human()
+                game.move_piece(piece, move)
 
-    print(game)
-    print("############################################################################")
-    # time.sleep(2)
+            else:
+                game.flip_board_nocopy()  # flip it for use
+
+                best_move = get_moves_computer(thing_2)
+
+                game.move_piece(best_move.oldLoc, best_move.newLoc)
+
+                game.flip_board_nocopy()  # flip it back
+
+        print(game)
+        print("############################################################################")
+        # time.sleep(2)
+

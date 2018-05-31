@@ -120,6 +120,7 @@ class CheckerBoard:
             self.board[new_r, new_c] = -CheckerBoard.KING_VAL
         self.current_turn *= -1
 
+
     def pretend_to_move_piece(self, old_loc, new_loc):
         board_copy = self.board.copy()
         r, c = old_loc
@@ -266,6 +267,13 @@ class CheckerBoard:
             return sum_vert / len(pieces)
         else:
             return 3.5
+
+    def __getitem__(self, item):
+        return self.board[item]
+
+    def __setitem__(self, key, value):
+        self.board[key] = value
+
 
 
 iteration = 0

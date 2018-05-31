@@ -2,6 +2,7 @@ import collections
 from tkinter import *
 
 from checkers import CheckerBoard
+from play_game_against_model import get_moves_computer
 
 SelectedPiece = collections.namedtuple("SelectedPiece", ['loc', 'team'])
 
@@ -21,7 +22,7 @@ class CheckerBoardGUI():
                                                                                 self.selected.loc[1])
 
     def click_piece(self, event):
-        selected_row, selected_col = event.x // 50, event.y // 50
+        selected_col, selected_row = event.x // 50, event.y // 50
         print("Clicking piece at:", selected_row, ",", selected_col)
         print(self.board.current_turn)
         print(self.board[selected_row, selected_col])
@@ -34,39 +35,41 @@ class CheckerBoardGUI():
 
     def repaint_board(self):
         self.draw_checkerboard()
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j] == 1:
+        for j, row in enumerate(self.board.board):
+            for i, piece in enumerate(row):
+                if piece == 1:
                     canvas.create_oval(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill='red')
-                elif self.board[i][j] == 0:
+                elif piece == 0:
                     if (i + j) % 2 == 0:
                         canvas.create_rectangle(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill="black")
                     else:
                         canvas.create_rectangle(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill="gray85")
-                elif self.board[i][j] == -1:
+                elif piece == -1:
                     canvas.create_oval(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill='blue2')
-                elif self.board[i][j] == CheckerBoard.KING_VAL:
+                elif piece == CheckerBoard.KING_VAL:
                     canvas.create_oval(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill='DarkOrange3')
-                elif self.board[i][j] == -CheckerBoard.KING_VAL:
+                elif piece == -CheckerBoard.KING_VAL:
                     canvas.create_oval(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill='SkyBlue1')
 
         if self.selected is not None:
-            row, col = self.selected.loc
+            col, row = self.selected.loc
             if self.selected.team == 1:
                 canvas.create_oval(row * 50, col * 50, (row + 1) * 50, (col + 1) * 50, fill='green')
             elif self.selected.team == -1:
                 canvas.create_oval(row * 50, col * 50, (row + 1) * 50, (col + 1) * 50, fill='purple1')
 
     def draw_checkerboard(self):
-        for row in range(8):
-            for col in range(8):
-                if (row + col) % 2 == 0:
-                    canvas.create_rectangle(row * 50, col * 50, (row + 1) * 50, (col + 1) * 50, fill="black")
+        for i, row in enumerate(self.board.board):
+            for j, piece in enumerate(row):
+                if (i + j) % 2 == 0:
+                    canvas.create_rectangle(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill="black")
                 else:
-                    canvas.create_rectangle(row * 50, col * 50, (row + 1) * 50, (col + 1) * 50, fill="gray85")
+                    canvas.create_rectangle(i * 50, j * 50, (i + 1) * 50, (j + 1) * 50, fill="gray85")
 
     def move_selected_piece(self, event):
-        target_row, target_col = event.x // 50, event.y // 50
+        if self.selected is None:
+            return
+        target_col, target_row = event.x // 50, event.y // 50
         print("Moving selected piece to:", target_row, ",", target_col)
         if self.selected is not None:
             if self.can_selected_piece_capture(target_row, target_col):
@@ -74,7 +77,18 @@ class CheckerBoardGUI():
             elif self.can_selected_piece_move(target_row, target_col):
                 self.board.move_piece(self.selected.loc, (target_row, target_col, False))
         self.selected = None
+        self.move_ai_piece()
+
         self.repaint_board()
+
+    def move_ai_piece(self):
+        self.board.flip_board_nocopy()  # flip it for use
+
+        best_move = get_moves_computer(self.board)
+
+        self.board.move_piece(best_move.oldLoc, best_move.newLoc)
+
+        self.board.flip_board_nocopy()  # flip it back
 
     def deselect_piece(self):
         self.selected = None

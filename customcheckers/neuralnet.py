@@ -36,15 +36,15 @@ thing_2.compile(optimizer="adadelta", loss="mse", metrics=['accuracy'])
 
 
 try:
-    thing_1.load_weights("thing1___" + FILE_NAME)
+    thing_1.load_weights("customcheckers/thing1___" + FILE_NAME)
 except Exception:
     print("WARN: model thing1 has not been saved previously")
 else:
     print("Loaded thing 1 a-ok")
 
 try:
-    thing_2.load_weights("thing2___" + FILE_NAME)
-except Exception:
+    thing_2.load_weights("customcheckers/thing2___" + FILE_NAME)
+except Exception as e:
     print("WARN: model thing2 has not been saved previously")
 else:
     print("loaded thing2 a-ok")

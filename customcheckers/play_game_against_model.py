@@ -35,8 +35,8 @@ def get_moves_human():
     return piece, move
 
 
-def get_moves_computer(model=thing_2):
-    moves = game.get_all_possible_moves()
+def get_moves_computer(board, model=thing_2):
+    moves = board.get_all_possible_moves()
 
     possible_moves_lst = []
     random.shuffle(possible_moves_lst)
@@ -52,6 +52,7 @@ def get_moves_computer(model=thing_2):
     scores = [model.predict(vec)[0, 0] for vec in possible_state_vecs]
 
     return possible_moves_lst[max_index(scores)]
+
 
 if __name__ == "__main__":
     while not game.is_game_over()[0]:
@@ -77,4 +78,3 @@ if __name__ == "__main__":
         print(game)
         print("############################################################################")
         # time.sleep(2)
-
